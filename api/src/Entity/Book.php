@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BookRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ApiResource()]
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
 {
@@ -36,15 +38,16 @@ class Book
     private ?string $text = null;
 
     /**
-     * @var Collection<int, PublishHouseBook>
+     * @var Collection<int, Booking>
      */
-    #[ORM\OneToMany(targetEntity: PublishHouseBook::class, mappedBy: 'book')]
-    private Collection $publishHouseBooks;
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'book')]
+    private Collection $bookings;
 
     public function __construct()
     {
-        $this->publishHouseBooks = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -124,29 +127,29 @@ class Book
     }
 
     /**
-     * @return Collection<int, PublishHouseBook>
+     * @return Collection<int, Booking>
      */
-    public function getPublishHouseBooks(): Collection
+    public function getBookings(): Collection
     {
-        return $this->publishHouseBooks;
+        return $this->bookings;
     }
 
-    public function addPublishHouseBook(PublishHouseBook $publishHouseBook): static
+    public function addBooking(Booking $booking): static
     {
-        if (!$this->publishHouseBooks->contains($publishHouseBook)) {
-            $this->publishHouseBooks->add($publishHouseBook);
-            $publishHouseBook->setBook($this);
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->setBook($this);
         }
 
         return $this;
     }
 
-    public function removePublishHouseBook(PublishHouseBook $publishHouseBook): static
+    public function removeBooking(Booking $booking): static
     {
-        if ($this->publishHouseBooks->removeElement($publishHouseBook)) {
+        if ($this->bookings->removeElement($booking)) {
             // set the owning side to null (unless already changed)
-            if ($publishHouseBook->getBook() === $this) {
-                $publishHouseBook->setBook(null);
+            if ($booking->getBook() === $this) {
+                $booking->setBook(null);
             }
         }
 

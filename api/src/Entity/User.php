@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\EntityListener\UserEntityListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,7 +18,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Email;
 
 
-
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(normalizationContext: ['groups' => ['user:get']],),
+        new Post(normalizationContext: ['groups' => ['user:get']], denormalizationContext: ['groups' => ['user:post']]),
+    ]
+)]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -28,10 +38,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Groups(["user:read"])]
+    #[Groups([
+        "user:get",
+        "user:post",
+    ])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
-    #[Groups(["user:read"])]
+
+    #[Groups([
+        "user:get",
+    ])]
     #[ORM\Column(length: 255)]
     private ?string $surname = null;
 
@@ -46,6 +62,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::ARRAY)]
     private array $roles = [];
 
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'user')]
+    private Collection $bookings;
 
     #[ORM\PrePersist]
     public function changeName(): void
@@ -54,7 +75,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
     public function __construct()
     {
-
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -141,6 +162,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
 
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getUser() === $this) {
+                $booking->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
 }
