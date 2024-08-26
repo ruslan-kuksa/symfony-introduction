@@ -18,27 +18,37 @@ class BookingEntityListener
      * @param LifecycleEventArgs $eventArgs
      * @return void
      */
-    public function prePersist(User $user, Booking $booking, LifecycleEventArgs $eventArgs): void
+    public function prePersist(Booking $booking, LifecycleEventArgs $eventArgs): void
     {
-        $bookingReceiver = [
+        $user = $booking->getUser();
+        $book = $booking->getBook();
+
+
+        $booking = [
             'date' => $booking->getDate()->format('Y-m-d'),
-            'book' => $booking->getBook(),
-            'user' => $booking->getUser(),
             'status' => $booking->getStatus(),
         ];
 
         $userReceiver = [
-            'userEmail' => $user->getEmail(),
+            'email' => $user->getEmail(),
             'name' => $user->getName(),
             'surName' => $user->getSurname(),
         ];
-
-        $userInfo = [
-            'from' => $userReceiver['name'].' '.$userReceiver['surName'],
-            'text' => 'Тестова пошта для тесту',
+        $book = [
+            'title' => $book->getTitle(),
+            'name' => $book->getName(),
+            'filepath' => $book->getFilepath(),
+            'wrote_at' => $book->getWroteAt()->format('Y-m-d'),
+            'text' => $book->getText(),
+        ];
+        $Info = [
+            'to' => $userReceiver['name'].' '.$userReceiver['surName'],
+            'book' => $book['name'].' '.$book['wrote_at'].' '.$book['text'].' '.$book['title'].' '.$book['filepath'],
+            'booking' => $booking['date'].' '.$booking['status'],
+            'text' => 'Thanks for purchase',
         ];
 
         //Send mail to Receiver
-        $this->mailerService->SendMailFunc($bookingReceiver, $userReceiver, $userInfo);
+        $this->mailerService->SendMailFunc($userReceiver, $Info);
     }
 }

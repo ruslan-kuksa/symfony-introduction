@@ -15,16 +15,17 @@ class MailerService
      * @param $info
      * @return void
      */
-    public function SendMailFunc($booking, $user, $info):void
+    public function SendMailFunc($user, $info):void
     {
-
         $email = (new TemplatedEmail())
-            ->from('no-reply@acidShark.com')
-            ->to($user['userEmail'])
+            ->from('no-reply@inbox.mailtrap.io')
+            ->to($user['email'])
             ->subject('Тестовий меіл !')
             ->htmlTemplate('mailTemplate.twig')
             ->context([
-                'from' => $info['from'],
+                'to' => $info['to'],
+                'book' => $info['book'],
+                'booking' => $info['booking'],
                 'text' => $info['text'],
             ]);
 
