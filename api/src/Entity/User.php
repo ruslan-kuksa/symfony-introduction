@@ -68,11 +68,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'user')]
     private Collection $bookings;
 
-    #[ORM\PrePersist]
+/*    #[ORM\PrePersist]
     public function changeName(): void
     {
         $this->name= "TEST";
-    }
+    }*/
     public function __construct()
     {
         $this->bookings = new ArrayCollection();

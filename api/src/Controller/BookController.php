@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Author;
 use App\Entity\Book;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +19,14 @@ class BookController extends AbstractController
         protected EntityManagerInterface $entityManager,
     )
     {}
-    #[Route('/api/book-create', name: 'app_author', methods: ['POST'])]
+    #[Route('/api/book-create', name: 'app_book', methods: ['POST'])]
     public function bookCreate(Request $request): Response
     {
+        $data = json_decode($request->getContent(), true);
         $book = $this->serializer->deserialize($request->getContent(), Book::class, 'json');
+        $author = $this->entityManager->getRepository(Author::class)->find($data['author_id']);
 
+        $book->setAuthor($author);
         $this->entityManager->persist($book);
         $this->entityManager->flush();
 
@@ -31,7 +35,7 @@ class BookController extends AbstractController
         return new JsonResponse($jsonData, Response::HTTP_CREATED, [], true);
     }
 
-    #[Route('/api/book-list', name: 'app_author', methods: ['GET'])]
+    #[Route('/api/book-list', name: 'app_book_get', methods: ['GET'])]
     public function bookList(Request $request): Response
     {
         $books = $this->entityManager->getRepository(Book::class)->findAll();
@@ -39,7 +43,7 @@ class BookController extends AbstractController
         return new JsonResponse($jsonData, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/book/{id}', name: 'app_author', methods: ['GET'])]
+    #[Route('/api/book/{id}', name: 'app_book_get_id', methods: ['GET'])]
     public function book(Request $request, string $id): Response
     {
         $book = $this->entityManager->getRepository(Book::class)->findOneBy(['id' => $id]);
@@ -47,7 +51,7 @@ class BookController extends AbstractController
         return new JsonResponse($jsonData, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/book/{id}', name: 'app_author', methods: ['DELETE'])]
+    #[Route('/api/book/{id}', name: 'app_book_delete', methods: ['DELETE'])]
     public function bookDelete(Request $request, string $id): Response
     {
         $book = $this->entityManager->getRepository(Book::class)->findOneBy(['id' => $id]);
@@ -57,7 +61,7 @@ class BookController extends AbstractController
         return new JsonResponse($jsonData, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/book/{id}', name: 'app_author', methods: ['PUT'])]
+    #[Route('/api/book/{id}', name: 'app_book_update', methods: ['PUT'])]
     public function bookUpdate(Request $request, string $id): Response
     {
         $book = $this->entityManager->getRepository(Book::class)->findOneBy(['id' => $id]);
