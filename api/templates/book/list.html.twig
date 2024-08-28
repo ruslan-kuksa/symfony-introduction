@@ -7,6 +7,23 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
 </style>
 </head>
 <body>
@@ -19,6 +36,7 @@
         <li>WroteAt: {{ book.wroteAt|date("m.d.Y")}}</li>
         <li>File Path: {{ book.filePath }}</li>
         <li>text: {{ book.text }}</li>
+        <br><br>
     {% endfor %}
 </ul>
 </body>
