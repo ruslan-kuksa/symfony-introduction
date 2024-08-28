@@ -39,10 +39,11 @@ class BookController extends AbstractController
     public function bookList(Request $request): Response
     {
         $books = $this->entityManager->getRepository(Book::class)->findAll();
-        $jsonData = $this->serializer->serialize($books, 'json');
-        return new JsonResponse($jsonData, Response::HTTP_OK, [], true);
-    }
 
+        return $this->render('book/list.html.twig', [
+            'books' => $books,
+        ]);
+    }
     #[Route('/api/book/{id}', name: 'app_book_get_id', methods: ['GET'])]
     public function book(Request $request, string $id): Response
     {
